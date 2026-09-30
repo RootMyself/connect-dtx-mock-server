@@ -25,7 +25,20 @@ export function initDb(path: string): void {
     "CREATE TABLE IF NOT EXISTS tokens(access_token TEXT PRIMARY KEY, client_id TEXT NOT NULL, zone TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)",
   );
   db.exec("CREATE TABLE IF NOT EXISTS scenarios(key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+  db.exec(
+    "CREATE TABLE IF NOT EXISTS organizations(oid TEXT PRIMARY KEY, seq INTEGER NOT NULL UNIQUE, name TEXT NOT NULL, address TEXT NOT NULL, postal TEXT NOT NULL, phone_digits TEXT NOT NULL, fingerprint TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL)",
+  );
+  db.exec(
+    "CREATE TABLE IF NOT EXISTS phicodes(phi_code TEXT PRIMARY KEY, user_hash TEXT NOT NULL, org_oid TEXT, created_at INTEGER NOT NULL)",
+  );
   db.exec("CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+  // 기존 data/connectdtx.db additive 마이그레이션: 구 phicodes(org_oid 없음) → 컬럼 추가.
+  const phicodeColumns = new Set(
+    (db.prepare("PRAGMA table_info(phicodes)").all() as { name: string }[]).map((row) => row.name),
+  );
+  if (!phicodeColumns.has("org_oid")) {
+    db.exec("ALTER TABLE phicodes ADD COLUMN org_oid TEXT");
+  }
   closed = false;
 }
 

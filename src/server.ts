@@ -3,6 +3,8 @@ import { seedDefaultClientsIfEmpty } from "./clients.ts";
 import type { Config } from "./config.ts";
 import { loadConfig } from "./config.ts";
 import { closeDb, initDb } from "./db.ts";
+import { seedDefaultOrganization } from "./organizations.ts";
+import { seedLegacyPhiCodes } from "./phicodes.ts";
 
 let config: Config;
 try {
@@ -18,7 +20,8 @@ try {
   console.error(err instanceof Error ? err.message : err);
   process.exit(1);
 }
-
+const defaultOrg = seedDefaultOrganization();
+seedLegacyPhiCodes(defaultOrg.oid);
 try {
   seedDefaultClientsIfEmpty(
     config.clientId,

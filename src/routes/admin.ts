@@ -9,6 +9,7 @@ import {
 } from "../clients.ts";
 import type { Config } from "../config.ts";
 import { isRecord } from "../guards.ts";
+import { listOrganizations } from "../organizations.ts";
 import { clearScenario, getScenario, listScenarios, setScenario } from "../tokens.ts";
 
 interface RouteOptions {
@@ -159,6 +160,9 @@ export default async function routes(app: FastifyInstance, opts: RouteOptions): 
     return reply.code(204).send();
   });
 
+  app.get("/admin/organizations", async (_request, reply) => {
+    return reply.code(200).send({ organizations: listOrganizations() });
+  });
   // 실패 주입: PUT {"key":"dtxprcp","value":"503:1"} → 해당 경로가 503 반환.
   // value "expired" (validate 전용) 또는 "http:result_code" 형식.
   app.get("/admin/scenarios", async (_request, reply) => {

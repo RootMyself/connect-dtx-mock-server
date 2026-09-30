@@ -63,10 +63,7 @@ describe("connect-dtx FHIR", () => {
       assert.equal(patient?.resource.identifier?.[0]?.value, "PHI-9");
       const org = body.entry.find((e) => e.resource.resourceType === "Organization");
       assert.equal(org?.resource.identifier?.[0]?.system, "urn:ietf:rfc:3986");
-      assert.equal(
-        org?.resource.identifier?.[0]?.value,
-        "urn:oid:1.2.410.100110.10.11100443",
-      );
+      assert.equal(org?.resource.identifier?.[0]?.value, "urn:oid:1.2.410.100110.10.11100443");
     } finally {
       await app.close();
       closeTestDb();
