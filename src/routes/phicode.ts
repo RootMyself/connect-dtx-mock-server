@@ -114,7 +114,7 @@ form.addEventListener("submit", async (e) => {
   }
   codeEl.textContent = body.phi_code + " / " + body.org_oid;
   curlEl.textContent = "GET /legacy/phicode/validate?code=" + body.phi_code;
-  emrEl.href = "http://localhost:8080?phi_code=" + encodeURIComponent(body.phi_code);
+  emrEl.href = "http://localhost:8089?phi_code=" + encodeURIComponent(body.phi_code);
   result.classList.add("show");
 });
 document.getElementById("copy").addEventListener("click", async () => {
