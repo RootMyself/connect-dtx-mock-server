@@ -46,7 +46,12 @@ describe("connect-dtx FHIR", () => {
       assert.equal(res.statusCode, 200);
       const body = res.json() as {
         resourceType: string;
-        entry: { resource: { resourceType: string; identifier?: { value: string }[] } }[];
+        entry: {
+          resource: {
+            resourceType: string;
+            identifier?: { system: string; value: string }[];
+          };
+        }[];
       };
       assert.equal(body.resourceType, "Bundle");
       assert.equal(body.entry.length, 8);
@@ -56,6 +61,12 @@ describe("connect-dtx FHIR", () => {
       }
       const patient = body.entry.find((e) => e.resource.resourceType === "Patient");
       assert.equal(patient?.resource.identifier?.[0]?.value, "PHI-9");
+      const org = body.entry.find((e) => e.resource.resourceType === "Organization");
+      assert.equal(org?.resource.identifier?.[0]?.system, "urn:ietf:rfc:3986");
+      assert.equal(
+        org?.resource.identifier?.[0]?.value,
+        "urn:oid:1.2.410.100110.10.11100443",
+      );
     } finally {
       await app.close();
       closeTestDb();

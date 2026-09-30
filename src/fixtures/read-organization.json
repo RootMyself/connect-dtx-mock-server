@@ -2,8 +2,8 @@
   "resourceType": "Organization",
   "id": "org-1",
   "identifier": [ {
-    "system": "https://connectdtx.kr/fhir/hira-code",
-    "value": "00000000"
+    "system": "urn:ietf:rfc:3986",
+    "value": "urn:oid:1.2.410.100110.10.11100443"
   } ],
   "type": [ {
     "coding": [ {
