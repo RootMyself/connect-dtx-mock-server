@@ -1,0 +1,63 @@
+import { buildApp } from "./app.ts";
+import { seedDefaultClientsIfEmpty } from "./clients.ts";
+import type { Config } from "./config.ts";
+import { loadConfig } from "./config.ts";
+import { closeDb, initDb } from "./db.ts";
+
+let config: Config;
+try {
+  config = loadConfig();
+} catch (err) {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
+
+try {
+  initDb(config.dbPath);
+} catch (err) {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
+
+try {
+  seedDefaultClientsIfEmpty(
+    config.clientId,
+    config.clientSecret,
+    config.govClientId,
+    config.govClientSecret,
+  );
+} catch (err) {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
+
+const app = buildApp(config);
+
+app.addHook("onClose", async () => {
+  closeDb();
+});
+
+let shuttingDown = false;
+function shutdown(): void {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  void app.close().then(
+    () => {
+      process.exit(0);
+    },
+    (err: unknown) => {
+      app.log.error(err);
+      process.exit(1);
+    },
+  );
+}
+process.once("SIGTERM", shutdown);
+process.once("SIGINT", shutdown);
+
+try {
+  await app.listen({ port: config.port, host: config.host });
+  console.log(`connect-dtx-mock-server listening on http://${config.host}:${config.port}`);
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
+}

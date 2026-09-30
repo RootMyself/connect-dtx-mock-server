@@ -1,0 +1,29 @@
+{
+  "resourceType": "ServiceRequest",
+  "id": "sr-1",
+  "identifier": [ {
+    "system": "https://connectdtx.net/phicode",
+    "value": "PHI-TEST-0001"
+  } ],
+  "status": "active",
+  "intent": "order",
+  "doNotPerform": false,
+  "code": {
+    "coding": [ {
+      "system": "https://connectdtx.kr/fhir/CodeSystem/dtx-product",
+      "code": "DTX-SOMZZ",
+      "display": "솜즈"
+    } ],
+    "text": "솜즈"
+  },
+  "subject": {
+    "reference": "Patient/patient-1"
+  },
+  "encounter": {
+    "reference": "Encounter/enc-1"
+  },
+  "authoredOn": "2026-09-23T10:00:00+09:00",
+  "requester": {
+    "reference": "PractitionerRole/pr-1"
+  }
+}

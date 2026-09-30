@@ -1,0 +1,29 @@
+{
+  "resourceType": "Organization",
+  "id": "org-1",
+  "identifier": [ {
+    "system": "https://connectdtx.kr/fhir/hira-code",
+    "value": "00000000"
+  } ],
+  "type": [ {
+    "coding": [ {
+      "system": "https://connectdtx.kr/fhir/CodeSystem/org-type",
+      "code": "prov",
+      "display": "의료기관"
+    } ]
+  } ],
+  "name": "테스트병원",
+  "telecom": [ {
+    "system": "phone",
+    "value": "0200000000",
+    "rank": 0
+  }, {
+    "system": "fax",
+    "value": "0200000001",
+    "rank": 0
+  } ],
+  "address": [ {
+    "text": "서울특별시 테스트구",
+    "postalCode": "00000"
+  } ]
+}

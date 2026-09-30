@@ -1,0 +1,16 @@
+services:
+  connect-dtx-mock-server:
+    build: .
+    image: connect-dtx-mock-server:local
+    container_name: connect-dtx-mock-server
+    ports:
+      - "8091:8091"
+    environment:
+      - "CLIENT_ID=test-client-id"
+      - "CLIENT_SECRET=test-client-secret"
+      - "GOV_CLIENT_ID=test-gov-client-id"
+      - "GOV_CLIENT_SECRET=test-gov-client-secret"
+      - "DB_PATH=/app/data/connectdtx.db"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

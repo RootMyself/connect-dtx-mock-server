@@ -1,0 +1,48 @@
+export interface Config {
+  port: number;
+  host: string;
+  clientId: string;
+  clientSecret: string;
+  govClientId: string;
+  govClientSecret: string;
+  strictCredentials: boolean;
+  tokenTtlMs: number;
+  dbPath: string;
+}
+
+function parseNumberEnv(name: string, raw: string | undefined, fallback: number): number {
+  if (raw === undefined || raw === "") return fallback;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || !Number.isInteger(value)) {
+    throw new Error(`Invalid ${name}=${JSON.stringify(raw)}: expected an integer number`);
+  }
+  return value;
+}
+
+function parseBoolEnv(name: string, raw: string | undefined, fallback: boolean): boolean {
+  if (raw === undefined || raw === "") return fallback;
+  const normalized = raw.trim().toLowerCase();
+  if (normalized === "true" || normalized === "1" || normalized === "yes") return true;
+  if (normalized === "false" || normalized === "0" || normalized === "no") return false;
+  throw new Error(`Invalid ${name}=${JSON.stringify(raw)}: expected a boolean (true/false)`);
+}
+
+function parseStringEnv(raw: string | undefined, fallback: string): string {
+  if (raw === undefined || raw === "") return fallback;
+  return raw;
+}
+
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  return {
+    port: parseNumberEnv("PORT", env["PORT"], 8091),
+    host: parseStringEnv(env["HOST"], "0.0.0.0"),
+    // dtx-fhir application-test.yaml 값과 일치 — base-url만 localhost:8091로 바꾸면 연결됨
+    clientId: parseStringEnv(env["CLIENT_ID"], "test-client-id"),
+    clientSecret: parseStringEnv(env["CLIENT_SECRET"], "test-client-secret"),
+    govClientId: parseStringEnv(env["GOV_CLIENT_ID"], "test-gov-client-id"),
+    govClientSecret: parseStringEnv(env["GOV_CLIENT_SECRET"], "test-gov-client-secret"),
+    strictCredentials: parseBoolEnv("STRICT_CREDENTIALS", env["STRICT_CREDENTIALS"], true),
+    tokenTtlMs: parseNumberEnv("TOKEN_TTL_MS", env["TOKEN_TTL_MS"], 86400000),
+    dbPath: parseStringEnv(env["DB_PATH"], "data/connectdtx.db"),
+  };
+}

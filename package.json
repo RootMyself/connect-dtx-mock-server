@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "fastify": "^5.12.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
+    "@types/node": "^22.20.3",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT",
+  "name": "connect-dtx-mock-server",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch src/server.ts",
+    "format": "biome check --write .",
+    "lint": "biome check .",
+    "start": "node src/server.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

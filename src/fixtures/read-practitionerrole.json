@@ -1,0 +1,39 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "pr-1",
+  "identifier": [ {
+    "system": "https://connectdtx.kr/fhir/practitioner-license",
+    "value": "LIC-0001"
+  } ],
+  "active": true,
+  "period": {
+    "start": "2020-01-01"
+  },
+  "practitioner": {
+    "reference": "Practitioner/doc-1",
+    "display": "테스트의사"
+  },
+  "organization": {
+    "reference": "Organization/org-1"
+  },
+  "code": [ {
+    "coding": [ {
+      "system": "https://connectdtx.kr/fhir/CodeSystem/practitioner-role",
+      "code": "doctor",
+      "display": "의사"
+    } ]
+  } ],
+  "specialty": [ {
+    "coding": [ {
+      "system": "https://connectdtx.kr/fhir/CodeSystem/specialty",
+      "code": "NP",
+      "display": "정신건강의학과"
+    } ],
+    "text": "정신건강의학과"
+  } ],
+  "telecom": [ {
+    "system": "phone",
+    "value": "0200000000",
+    "rank": 0
+  } ]
+}

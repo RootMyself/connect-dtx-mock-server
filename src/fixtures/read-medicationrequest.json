@@ -1,0 +1,25 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "mr-1",
+  "status": "active",
+  "intent": "order",
+  "priority": "routine",
+  "doNotPerform": false,
+  "medicationCodeableConcept": {
+    "coding": [ {
+      "system": "https://connectdtx.kr/fhir/CodeSystem/edi",
+      "code": "000000000",
+      "display": "테스트약"
+    } ]
+  },
+  "subject": {
+    "reference": "Patient/patient-1"
+  },
+  "encounter": {
+    "reference": "Encounter/enc-1"
+  },
+  "authoredOn": "2026-09-23T10:00:00+09:00",
+  "requester": {
+    "reference": "PractitionerRole/pr-1"
+  }
+}
