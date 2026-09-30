@@ -105,12 +105,13 @@ form.addEventListener("submit", async (e) => {
   const res = await fetch("/admin/phicodes/issue", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ name: form.name.value, phone: form.phone.value, hospitalName: form.hospitalName.value, hospitalAddress: form.hospitalAddress.value, hospitalPostal: form.hospitalPostal.value, hospitalPhone: form.hospitalPhone.value }),
+    body: JSON.stringify({ name: document.getElementById("name").value, phone: document.getElementById("phone").value, hospitalName: document.getElementById("hospitalName").value, hospitalAddress: document.getElementById("hospitalAddress").value, hospitalPostal: document.getElementById("hospitalPostal").value, hospitalPhone: document.getElementById("hospitalPhone").value }),
   });
   const body = await res.json().catch(() => ({}));
   if (res.status !== 201) {
     err.textContent = body.message ?? "발급 실패. 입력값을 확인한다.";
     return;
+  }
   codeEl.textContent = body.phi_code + " / " + body.org_oid;
   curlEl.textContent = "GET /legacy/phicode/validate?code=" + body.phi_code;
   emrEl.href = "http://localhost:8080?phi_code=" + encodeURIComponent(body.phi_code);
