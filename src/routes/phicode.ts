@@ -53,7 +53,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--teal); outl
 button { cursor: pointer; font-size: 15px; border-radius: 8px; border: 1px solid transparent; padding: 10px 16px; }
 button.issue { background: var(--navy); color: #fff; width: 100%; margin-top: 18px; }
 button.copy { background: #fff; border-color: var(--line); margin-top: 12px; }
-p.hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+a.emr { display: block; text-align: center; text-decoration: none; font-size: 15px; border-radius: 8px; padding: 10px 16px; background: var(--teal); color: #fff; margin-top: 12px; }
 section.result { margin-top: 16px; display: none; }
 section.result.show { display: block; }
 code.phi { display: block; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; word-break: break-all; background: var(--paper); border: 1px dashed var(--line); border-radius: 8px; padding: 12px; }
@@ -87,6 +87,7 @@ code.curl { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 1
 <section class="result" id="result" aria-live="polite">
 <code class="phi" id="code"></code>
 <button class="copy" id="copy" type="button">복사</button>
+<a class="emr" id="emr" href="#">처방 폼으로 이동 →</a>
 <p class="hint">검증: <code class="curl" id="curl"></code></p>
 </section>
 </main>
@@ -96,6 +97,7 @@ const err = document.getElementById("err");
 const result = document.getElementById("result");
 const codeEl = document.getElementById("code");
 const curlEl = document.getElementById("curl");
+const emrEl = document.getElementById("emr");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   err.textContent = "";
@@ -109,13 +111,14 @@ form.addEventListener("submit", async (e) => {
   if (res.status !== 201) {
     err.textContent = body.message ?? "발급 실패. 입력값을 확인한다.";
     return;
-  }
   codeEl.textContent = body.phi_code + " / " + body.org_oid;
   curlEl.textContent = "GET /legacy/phicode/validate?code=" + body.phi_code;
+  emrEl.href = "http://localhost:8080?phi_code=" + encodeURIComponent(body.phi_code);
   result.classList.add("show");
 });
 document.getElementById("copy").addEventListener("click", async () => {
-  await navigator.clipboard.writeText(codeEl.textContent ?? "");
+  const phi = (codeEl.textContent ?? "").split(" / ")[0] ?? "";
+  await navigator.clipboard.writeText(phi);
 });
 </script>
 </body>
