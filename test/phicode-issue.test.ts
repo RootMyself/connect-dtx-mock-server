@@ -134,6 +134,9 @@ describe("connect-dtx phicode issue", () => {
       const page = await app.inject({ method: "GET", url: "/phicode" });
       assert.equal(page.statusCode, 200);
       assert.match(page.headers["content-type"] ?? "", /text\/html/);
+      assert.match(page.body, /id="hospitalSelect"/);
+      assert.match(page.body, /서울대학교병원/);
+      assert.match(page.body, /하이픈은 없어도 된다/);
     } finally {
       await app.close();
       closeTestDb();

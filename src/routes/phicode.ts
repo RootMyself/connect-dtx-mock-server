@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { Config } from "../config.ts";
 import { isRecord } from "../guards.ts";
+import { HOSPITAL_PRESETS } from "../hospitals.ts";
 import {
   findOrCreateOrganization,
   normalizeOrgAddress,
@@ -29,6 +30,10 @@ function bearerValid(request: FastifyRequest): boolean {
   const found = findToken(token);
   return found !== undefined && Date.now() < found.expiresAt;
 }
+// 병원 드롭다운 단일 소스는 src/hospitals.ts. 값은 그대로 입력칸에 채워지고 서버가 정규화한다.
+const HOSPITAL_OPTIONS = HOSPITAL_PRESETS.map(
+  (h) => `<option value="${h.name}">${h.name}</option>`,
+).join("");
 
 // 로컬 개발용 발급 화면. 외부 의존성 없음. 결과 코드는 textContent로만 꽂는다.
 const PHICODE_PAGE = `<!doctype html>
@@ -48,9 +53,8 @@ p.sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
 form, section.result { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
 label { display: block; font-size: 14px; margin: 14px 0 6px; }
 label:first-of-type { margin-top: 0; }
-input { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
-input:focus-visible, button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-button { cursor: pointer; font-size: 15px; border-radius: 8px; border: 1px solid transparent; padding: 10px 16px; }
+input, select { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 button.issue { background: var(--navy); color: #fff; width: 100%; margin-top: 18px; }
 button.copy { background: #fff; border-color: var(--line); margin-top: 12px; }
 a.emr { display: block; text-align: center; text-decoration: none; font-size: 15px; border-radius: 8px; padding: 10px 16px; background: var(--teal); color: #fff; margin-top: 12px; }
@@ -72,6 +76,10 @@ code.curl { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 1
 <label for="phone">휴대폰 번호</label>
 <input id="phone" name="phone" inputmode="tel" autocomplete="tel" required placeholder="010-1234-5678">
 <p class="hint">숫자 10~11자리. 하이픈은 없어도 된다.</p>
+<label for="hospitalSelect">병원 선택 (자동 입력)</label>
+<select id="hospitalSelect">
+<option value="">직접 입력</option>
+${HOSPITAL_OPTIONS}</select>
 <label for="hospitalName">병원명</label>
 <input id="hospitalName" name="hospitalName" maxlength="64" required placeholder="테스트병원">
 <label for="hospitalAddress">병원주소</label>
@@ -81,8 +89,7 @@ code.curl { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 1
 <p class="hint">숫자 5자리.</p>
 <label for="hospitalPhone">병원전화번호</label>
 <input id="hospitalPhone" name="hospitalPhone" inputmode="tel" required placeholder="02-0000-0000">
-<button class="issue" type="submit">발급하기</button>
-<p class="error" id="err" role="alert"></p>
+<p class="hint">지역번호 포함. 하이픈은 없어도 된다.</p>
 </form>
 <section class="result" id="result" aria-live="polite">
 <code class="phi" id="code"></code>
@@ -98,6 +105,16 @@ const result = document.getElementById("result");
 const codeEl = document.getElementById("code");
 const curlEl = document.getElementById("curl");
 const emrEl = document.getElementById("emr");
+const hospitalSelect = document.getElementById("hospitalSelect");
+const PRESETS = ${JSON.stringify(HOSPITAL_PRESETS)};
+hospitalSelect.addEventListener("change", () => {
+  const found = PRESETS.find((h) => h.name === hospitalSelect.value);
+  if (found === undefined) return;
+  document.getElementById("hospitalName").value = found.name;
+  document.getElementById("hospitalAddress").value = found.address;
+  document.getElementById("hospitalPostal").value = found.postal;
+  document.getElementById("hospitalPhone").value = found.phone;
+});
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   err.textContent = "";
