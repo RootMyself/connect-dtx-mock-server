@@ -53,13 +53,9 @@ client-id/secret 4종은 mock 기본값이 dtx-fhir `application-test.yaml`과 �
 | `GET` | `/health` | `{"status":"UP"}` |
 | `POST` | `/oauth2/token` | `{"access_token":"..."}` |
 | `GET` | `/oauth2/token?grant_type=validate` | `{"result_code":"0"}` / 만료 `"7"` |
-| `GET` | `/phicode` | phi_code 발급 웹페이지 (이름+휴대폰+병원 4종 입력) |
-| `POST` | `/admin/phicodes/issue` | `{"phi_code":"...","org_oid":"urn:oid:..."}` — 병원 4종 필수, 같은 병원은 OID 재사용 |
-| `GET` | `/admin/organizations` | 발급된 병원 목록 (oid 순차 발번) |
-| `GET` | `/legacy/phicode/validate` | 발급 코드만 `result_code "0"`, 미발급 `"1"` |
-| `GET` | `/pauth/phicode/history` | `result_code "0"`, `list[]` |
-| `POST` | `/pauth/dtx/info` | `result_code "0"` |
-| `GET` | `/api/dtx/dtxprcp` | FHIR Bundle 8 entry (발급 병원 Organization 동적 반환) |
+| `GET` | `/phicode` | phi_code 발급 웹페이지 (이름+휴대폰+병원 4종+정부연관 체크) |
+| `POST` | `/admin/phicodes/issue` | `{"phi_code","org_oid","zone"}` — `isGov:true`면 gov OID·gov zone |
+| `GET` | `/admin/organizations` | 발급된 병원 목록 (oid·zone 순차 발번) |
 
 실패 주입은 `/admin/scenarios`로 한다. 상세는 [docs/quickstart.md](docs/quickstart.md).
 

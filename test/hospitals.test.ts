@@ -7,6 +7,7 @@ describe("hospital presets", () => {
     assert.equal(HOSPITAL_PRESETS.length, 7);
     for (const preset of HOSPITAL_PRESETS) {
       assert.equal(isValidPreset(preset), true, preset.name);
+      assert.equal(typeof preset.isGov, "boolean", preset.name);
     }
   });
 

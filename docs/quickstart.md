@@ -19,10 +19,12 @@ curl -s "http://localhost:8091/oauth2/token?grant_type=validate&" -H "Authorizat
 # {"result_code":"0"}
 ```
 ```bash
-# phi_code 발급 (웹 UI: http://localhost:8091/phicode — 이름+휴대폰+병원 4종 필수)
+# phi_code 발급 (웹 UI: http://localhost:8091/phicode — 이름+휴대폰+병원 4종 필수, 정부연관 체크박스)
 curl -s -X POST http://localhost:8091/admin/phicodes/issue \
   -H 'Content-Type: application/json' -d '{"name":"홍길동","phone":"01012345678","hospitalName":"서울테스트병원","hospitalAddress":"서울특별시 강남구 테스트로 1","hospitalPostal":"06000","hospitalPhone":"02-1234-5678"}'
-# {"phi_code":"...","org_oid":"urn:oid:1.2.410.100110.10.11100444"} — 같은 병원 4종이면 기존 OID 재사용
+# {"phi_code":"...","org_oid":"urn:oid:1.2.410.100110.10.11100444","zone":"test-api.janusync.com"}
+# gov: 위 바디에 "isGov":true 추가 → "zone":"test-api.gov.janusync.com"
+# 처방 폼 URL: http://localhost:18080?phi_code=<코드>&zone=<zone> (발급 UI 버튼이 자동 조립)
 # 병원 목록: GET /admin/organizations
 ```
 

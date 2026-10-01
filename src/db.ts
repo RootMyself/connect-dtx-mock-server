@@ -26,7 +26,7 @@ export function initDb(path: string): void {
   );
   db.exec("CREATE TABLE IF NOT EXISTS scenarios(key TEXT PRIMARY KEY, value TEXT NOT NULL)");
   db.exec(
-    "CREATE TABLE IF NOT EXISTS organizations(oid TEXT PRIMARY KEY, seq INTEGER NOT NULL UNIQUE, name TEXT NOT NULL, address TEXT NOT NULL, postal TEXT NOT NULL, phone_digits TEXT NOT NULL, fingerprint TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL)",
+    "CREATE TABLE IF NOT EXISTS organizations(oid TEXT PRIMARY KEY, seq INTEGER NOT NULL UNIQUE, zone TEXT NOT NULL DEFAULT 'normal', name TEXT NOT NULL, address TEXT NOT NULL, postal TEXT NOT NULL, phone_digits TEXT NOT NULL, fingerprint TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL)",
   );
   db.exec(
     "CREATE TABLE IF NOT EXISTS phicodes(phi_code TEXT PRIMARY KEY, user_hash TEXT NOT NULL, org_oid TEXT, created_at INTEGER NOT NULL)",
@@ -38,6 +38,15 @@ export function initDb(path: string): void {
   );
   if (!phicodeColumns.has("org_oid")) {
     db.exec("ALTER TABLE phicodes ADD COLUMN org_oid TEXT");
+  }
+  // zone 도입 전 organizations 행 승계용.
+  const orgColumns = new Set(
+    (db.prepare("PRAGMA table_info(organizations)").all() as { name: string }[]).map(
+      (row) => row.name,
+    ),
+  );
+  if (!orgColumns.has("zone")) {
+    db.exec("ALTER TABLE organizations ADD COLUMN zone TEXT");
   }
   closed = false;
 }

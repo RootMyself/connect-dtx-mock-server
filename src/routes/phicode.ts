@@ -8,6 +8,8 @@ import {
   normalizeOrgName,
   normalizeOrgPhone,
   normalizeOrgPostal,
+  normalizeOrgZone,
+  ZONE_HOSTS,
 } from "../organizations.ts";
 import {
   findPhiCode,
@@ -49,10 +51,10 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: -app
 header { background: var(--navy); color: #fff; padding: 14px 22px; font-size: 15px; }
 main { max-width: 560px; margin: 32px auto; padding: 0 20px 48px; }
 h1 { font-size: 22px; margin: 0 0 6px; }
-p.sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
-form, section.result { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
 label { display: block; font-size: 14px; margin: 14px 0 6px; }
 label:first-of-type { margin-top: 0; }
+label.check { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+label.check input { width: auto; }
 input, select { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: inherit; font: inherit; }
 input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 button { cursor: pointer; font-size: 15px; border-radius: 8px; border: 1px solid transparent; padding: 10px 16px; font: inherit; }
@@ -90,6 +92,7 @@ ${HOSPITAL_OPTIONS}</select>
 <label for="hospitalPhone">병원전화번호</label>
 <input id="hospitalPhone" name="hospitalPhone" inputmode="tel" required placeholder="02-0000-0000">
 <p class="hint">지역번호 포함. 하이픈은 없어도 된다.</p>
+<label class="check"><input type="checkbox" id="isGov"> 정부연관 병원 (gov zone)</label>
 <button class="issue" type="submit">발급하기</button>
 <p class="error" id="err" role="alert"></p>
 </form>
@@ -116,6 +119,7 @@ hospitalSelect.addEventListener("change", () => {
   document.getElementById("hospitalAddress").value = found.address;
   document.getElementById("hospitalPostal").value = found.postal;
   document.getElementById("hospitalPhone").value = found.phone;
+  document.getElementById("isGov").checked = found.isGov === true;
 });
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -124,16 +128,16 @@ form.addEventListener("submit", async (e) => {
   const res = await fetch("/admin/phicodes/issue", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ name: document.getElementById("name").value, phone: document.getElementById("phone").value, hospitalName: document.getElementById("hospitalName").value, hospitalAddress: document.getElementById("hospitalAddress").value, hospitalPostal: document.getElementById("hospitalPostal").value, hospitalPhone: document.getElementById("hospitalPhone").value }),
+    body: JSON.stringify({ name: document.getElementById("name").value, phone: document.getElementById("phone").value, hospitalName: document.getElementById("hospitalName").value, hospitalAddress: document.getElementById("hospitalAddress").value, hospitalPostal: document.getElementById("hospitalPostal").value, hospitalPhone: document.getElementById("hospitalPhone").value, isGov: document.getElementById("isGov").checked }),
   });
   const body = await res.json().catch(() => ({}));
   if (res.status !== 201) {
     err.textContent = body.message ?? "발급 실패. 입력값을 확인한다.";
     return;
   }
-  codeEl.textContent = body.phi_code + " / " + body.org_oid;
+  codeEl.textContent = body.phi_code + " / " + body.org_oid + " / " + body.zone;
   curlEl.textContent = "GET /legacy/phicode/validate?code=" + body.phi_code;
-  emrEl.href = "http://localhost:18080?phi_code=" + encodeURIComponent(body.phi_code);
+  emrEl.href = "http://localhost:18080?phi_code=" + encodeURIComponent(body.phi_code) + "&zone=" + encodeURIComponent(body.zone);
   result.classList.add("show");
 });
 document.getElementById("copy").addEventListener("click", async () => {
@@ -172,6 +176,7 @@ export default async function routes(app: FastifyInstance, opts: RouteOptions): 
     const orgAddress = normalizeOrgAddress(body["hospitalAddress"]);
     const orgPostal = normalizeOrgPostal(body["hospitalPostal"]);
     const orgPhone = normalizeOrgPhone(body["hospitalPhone"]);
+    const orgZone = normalizeOrgZone(body["isGov"]);
     if (
       orgName === undefined ||
       orgAddress === undefined ||
@@ -189,9 +194,12 @@ export default async function routes(app: FastifyInstance, opts: RouteOptions): 
       address: orgAddress,
       postal: orgPostal,
       phoneDigits: orgPhone,
+      zone: orgZone,
     });
     const issued = issuePhiCode(name, phone, org.oid);
-    return reply.code(201).send({ phi_code: issued.phiCode, org_oid: org.oid });
+    return reply
+      .code(201)
+      .send({ phi_code: issued.phiCode, org_oid: org.oid, zone: ZONE_HOSTS[org.zone] });
   });
 
   // GET /legacy/phicode/validate?code=&user_code= → result_code "0"이면 true.

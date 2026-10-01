@@ -37,15 +37,15 @@ async function issueToken(app: FastifyInstance): Promise<string> {
 
 async function issuePhiCode(
   app: FastifyInstance,
-  hospital: Record<string, string>,
-): Promise<{ phi_code: string; org_oid: string }> {
+  hospital: Record<string, unknown>,
+): Promise<{ phi_code: string; org_oid: string; zone: string }> {
   const res = await app.inject({
     method: "POST",
     url: "/admin/phicodes/issue",
     payload: { name: "홍길동", phone: "010-1234-5678", ...hospital },
   });
   assert.equal(res.statusCode, 201);
-  return res.json() as { phi_code: string; org_oid: string };
+  return res.json() as { phi_code: string; org_oid: string; zone: string };
 }
 
 describe("hospital organizations", () => {
@@ -55,8 +55,29 @@ describe("hospital organizations", () => {
     try {
       const first = await issuePhiCode(app, HOSPITAL);
       assert.match(first.org_oid, /^urn:oid:1\.2\.410\.100110\.10\.[0-9]{8}$/);
+      assert.equal(first.zone, "test-api.janusync.com");
       const second = await issuePhiCode(app, HOSPITAL);
       assert.equal(second.org_oid, first.org_oid);
+    } finally {
+      await app.close();
+      closeTestDb();
+    }
+  });
+
+  it("gov 체크 시 gov OID 발번 + gov zone 반환, 같은 4종도 분리", async () => {
+    initTestDb(seed);
+    const app = buildApp({ dbPath: ":memory:" });
+    try {
+      const normal = await issuePhiCode(app, HOSPITAL);
+      const gov = await issuePhiCode(app, { ...HOSPITAL, isGov: true });
+      assert.notEqual(gov.org_oid, normal.org_oid);
+      assert.equal(gov.zone, "test-api.gov.janusync.com");
+      const govAgain = await issuePhiCode(app, { ...HOSPITAL, isGov: true });
+      assert.equal(govAgain.org_oid, gov.org_oid);
+      const list = await app.inject({ method: "GET", url: "/admin/organizations" });
+      const orgs = (list.json() as { organizations: { oid: string; zone: string }[] })
+        .organizations;
+      assert.equal(orgs.find((o) => o.oid === gov.org_oid)?.zone, "gov");
     } finally {
       await app.close();
       closeTestDb();

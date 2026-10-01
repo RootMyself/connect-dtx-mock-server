@@ -137,6 +137,8 @@ describe("connect-dtx phicode issue", () => {
       assert.match(page.body, /id="hospitalSelect"/);
       assert.match(page.body, /서울대학교병원/);
       assert.match(page.body, /하이픈은 없어도 된다/);
+      assert.match(page.body, /id="isGov"/);
+      assert.match(page.body, /정부연관 병원/);
     } finally {
       await app.close();
       closeTestDb();
