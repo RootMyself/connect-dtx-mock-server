@@ -96,7 +96,7 @@ ${HOSPITAL_OPTIONS}</select>
 <section class="result" id="result" aria-live="polite">
 <code class="phi" id="code"></code>
 <button class="copy" id="copy" type="button">복사</button>
-<a class="emr" id="emr" href="#">처방 폼으로 이동 →</a>
+<a class="emr" id="emr" href="#" target="_blank" rel="noopener">처방 폼으로 이동 →</a>
 <p class="hint">검증: <code class="curl" id="curl"></code></p>
 </section>
 </main>
