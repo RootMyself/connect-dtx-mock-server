@@ -6,11 +6,11 @@
 ## Docker로 실행
 
 ```bash
-docker pull rootmyself/connect-dtx-mock-server:v0.1.0
+docker pull rootmyself/connect-dtx-mock-server:v0.2.0
 ```
 
 ```bash
-docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.1.0
+docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.2.0
 curl -s http://localhost:8091/health
 ```
 
@@ -40,11 +40,21 @@ client-id/secret 4종은 mock 기본값이 dtx-fhir `application-test.yaml`과 �
 | 변수 | 기본값 | 설명 |
 |---|---|---|
 | `PORT` | `8091` | 컨테이너 리슨 포트 |
+| `PUBLIC_BASE_URL` | `http://localhost:${PORT}` | 시작 로그 기준 URL. 끝 `/` 자동 제거 |
 | `CLIENT_ID` / `CLIENT_SECRET` | `test-client-id` / `test-client-secret` | 일반 도메인 최초 시드 |
 | `GOV_CLIENT_ID` / `GOV_CLIENT_SECRET` | `test-gov-client-id` / `test-gov-client-secret` | 정부 도메인 최초 시드 |
 | `STRICT_CREDENTIALS` | `true` | `false`면 DB 조회 생략 (로컬 디버깅용) |
 | `TOKEN_TTL_MS` | `86400000` | 토큰 유효시간 (24시간) |
 | `DB_PATH` | `data/connectdtx.db` | SQLite 경로. `:memory:`면 휘발성 |
+
+.env 파일이 있으면 compose·`npm run dev`·`npm start`가 그대로 쓴다:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+shell에 직접 export한 값이 .env보다 우선한다. `CLIENT_ID`/`CLIENT_SECRET` 변경은 첫 기동 1회만 시드되어 SQLite에 영속되므로, 변경 후에는 `docker compose down && rm -rf ./data && docker compose up -d --build`로 재시드한다.
 
 ## 엔드포인트 계약
 

@@ -2,6 +2,7 @@ node_modules/
 .omo/
 *.log
 .env*
+!.env.example
 .idea/
 data/
 *.db

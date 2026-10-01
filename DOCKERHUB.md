@@ -8,13 +8,13 @@ Node 26 + Fastify + SQLite 영속화로 로컬에서 바로 실행된다.
 이미지 받기:
 
 ```bash
-docker pull rootmyself/connect-dtx-mock-server:v0.1.0
+docker pull rootmyself/connect-dtx-mock-server:v0.2.0
 ```
 
 컨테이너 실행 후 상태 확인:
 
 ```bash
-docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.1.0
+docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.2.0
 curl -s http://localhost:8091/health
 ```
 
@@ -27,7 +27,7 @@ curl -s http://localhost:8091/health
 ```yaml
 services:
   connect-dtx-mock-server:
-    image: rootmyself/connect-dtx-mock-server:v0.1.0
+    image: rootmyself/connect-dtx-mock-server:v0.2.0
     container_name: connect-dtx-mock-server
     ports:
       - "127.0.0.1:8091:8091"
@@ -48,7 +48,10 @@ docker compose up -d
 
 | 변수 | 기본값 | 설명 |
 |---|---|---|
-| `PORT` | `8091` | 컨테이너 리슨 포트. 바꾸면 호스트 매핑도 함께 바꾼다 |
+| `PORT` | `8091` | 컨테이너 리슨 포트. 바꾸면 호스트 매핑도 함께 바뀐다 |
+| `PUBLIC_BASE_URL` | `http://localhost:${PORT}` | 시작 로그 기준 URL |
+| `CLIENT_ID` / `CLIENT_SECRET` | `test-client-id` / `test-client-secret` | 일반 도메인 최초 시드 |
+| `GOV_CLIENT_ID` / `GOV_CLIENT_SECRET` | `test-gov-client-id` / `test-gov-client-secret` | 정부 도메인 최초 시드 |
 | `DB_PATH` | `data/connectdtx.db` | SQLite 파일 경로. `:memory:` 는 휘발성이다 |
 | `STRICT_CREDENTIALS` | `true` | 등록된 클라이언트만 통과. `false` 는 로컬 디버깅용이다 |
 | `TOKEN_TTL_MS` | `86400000` | 접근 토큰 유효시간. 24시간이다 |

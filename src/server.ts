@@ -6,6 +6,15 @@ import { closeDb, initDb } from "./db.ts";
 import { seedDefaultOrganization } from "./organizations.ts";
 import { seedLegacyPhiCodes } from "./phicodes.ts";
 
+// .env 자동 로드 (없으면 무시). shell/compose 환경변수가 우선한다.
+try {
+  process.loadEnvFile();
+} catch (err) {
+  const isMissingEnvFile =
+    typeof err === "object" && err !== null && "code" in err && err.code === "ENOENT";
+  if (!isMissingEnvFile) throw err;
+}
+
 let config: Config;
 try {
   config = loadConfig();
