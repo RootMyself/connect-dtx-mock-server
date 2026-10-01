@@ -55,7 +55,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            rootmyself/connect-dtx-mock-server
+            npnl/connect-dtx-mock-server
             ghcr.io/RootMyself/connect-dtx-mock-server
           tags: |
             type=semver,pattern=v{{version}}

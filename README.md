@@ -6,11 +6,11 @@
 ## Docker로 실행
 
 ```bash
-docker pull rootmyself/connect-dtx-mock-server:v0.2.0
+docker pull npnl/connect-dtx-mock-server:v0.1.0
 ```
 
 ```bash
-docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.2.0
+docker run -d -p 127.0.0.1:8091:8091 npnl/connect-dtx-mock-server:v0.1.0
 curl -s http://localhost:8091/health
 ```
 

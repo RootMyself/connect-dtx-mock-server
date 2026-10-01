@@ -8,13 +8,13 @@ Node 26 + Fastify + SQLite 영속화로 로컬에서 바로 실행된다.
 이미지 받기:
 
 ```bash
-docker pull rootmyself/connect-dtx-mock-server:v0.2.0
+docker pull npnl/connect-dtx-mock-server:v0.1.0
 ```
 
 컨테이너 실행 후 상태 확인:
 
 ```bash
-docker run -d -p 127.0.0.1:8091:8091 rootmyself/connect-dtx-mock-server:v0.2.0
+docker run -d -p 127.0.0.1:8091:8091 npnl/connect-dtx-mock-server:v0.1.0
 curl -s http://localhost:8091/health
 ```
 
@@ -27,7 +27,7 @@ curl -s http://localhost:8091/health
 ```yaml
 services:
   connect-dtx-mock-server:
-    image: rootmyself/connect-dtx-mock-server:v0.2.0
+    image: npnl/connect-dtx-mock-server:v0.1.0
     container_name: connect-dtx-mock-server
     ports:
       - "127.0.0.1:8091:8091"
