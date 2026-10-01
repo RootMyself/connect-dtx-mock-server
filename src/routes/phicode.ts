@@ -53,10 +53,10 @@ p.sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
 form, section.result { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
 label { display: block; font-size: 14px; margin: 14px 0 6px; }
 label:first-of-type { margin-top: 0; }
-input, select { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+input, select { width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: inherit; font: inherit; }
 input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+button { cursor: pointer; font-size: 15px; border-radius: 8px; border: 1px solid transparent; padding: 10px 16px; font: inherit; }
 button.issue { background: var(--navy); color: #fff; width: 100%; margin-top: 18px; }
-button.copy { background: #fff; border-color: var(--line); margin-top: 12px; }
 a.emr { display: block; text-align: center; text-decoration: none; font-size: 15px; border-radius: 8px; padding: 10px 16px; background: var(--teal); color: #fff; margin-top: 12px; }
 section.result { margin-top: 16px; display: none; }
 section.result.show { display: block; }
