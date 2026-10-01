@@ -90,6 +90,8 @@ ${HOSPITAL_OPTIONS}</select>
 <label for="hospitalPhone">병원전화번호</label>
 <input id="hospitalPhone" name="hospitalPhone" inputmode="tel" required placeholder="02-0000-0000">
 <p class="hint">지역번호 포함. 하이픈은 없어도 된다.</p>
+<button class="issue" type="submit">발급하기</button>
+<p class="error" id="err" role="alert"></p>
 </form>
 <section class="result" id="result" aria-live="polite">
 <code class="phi" id="code"></code>
