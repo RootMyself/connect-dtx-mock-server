@@ -25,6 +25,8 @@ const PROJECT_INFO = {
     dtxInfo: "POST /pauth/dtx/info",
     dtxPrescription: "GET /api/dtx/dtxprcp",
     dtxResult: "POST /api/dtx/dtxresult",
+    dtxResultPage: "GET /dtxresult",
+    dtxResultList: "GET /admin/dtx-results",
   },
 } as const;
 

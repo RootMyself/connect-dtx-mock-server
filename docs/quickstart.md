@@ -46,6 +46,12 @@ curl -s -X POST "http://localhost:8091/api/dtx/dtxresult?phicode=PHI-1" \
   -H 'Content-Type: application/fhir+json; charset=UTF-8' -H 'Accept: application/fhir+json' \
   -d '{"resourceType":"Bundle","type":"transaction","entry":[]}'
 ```
+```bash
+# 수신 확인: 일일/주간 탭 UI + 요약 API (PDF 원문은 크기만)
+open http://localhost:8091/dtxresult
+curl -s "http://localhost:8091/admin/dtx-results?kind=daily"
+curl -s "http://localhost:8091/admin/dtx-results?kind=weekly"
+```
 
 ```bash
 # 실패 주입: dtxprcp 503 → DtxService 503 경로 재현

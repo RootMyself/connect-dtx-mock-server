@@ -1,6 +1,7 @@
 export interface Config {
   port: number;
   host: string;
+  publicBaseUrl: string;
   clientId: string;
   clientSecret: string;
   govClientId: string;
@@ -31,11 +32,26 @@ function parseStringEnv(raw: string | undefined, fallback: string): string {
   if (raw === undefined || raw === "") return fallback;
   return raw;
 }
+function parsePublicBaseUrl(raw: string | undefined, port: number): string {
+  if (raw === undefined || raw === "") return `http://localhost:${port}`;
+  const trimmed = raw.trim().replace(/\/+$/, "");
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("bad protocol");
+  } catch {
+    throw new Error(
+      `Invalid PUBLIC_BASE_URL=${JSON.stringify(raw)}: expected an absolute http(s) URL`,
+    );
+  }
+  return trimmed;
+}
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  const port = parseNumberEnv("PORT", env["PORT"], 8091);
   return {
-    port: parseNumberEnv("PORT", env["PORT"], 8091),
+    port,
     host: parseStringEnv(env["HOST"], "0.0.0.0"),
+    publicBaseUrl: parsePublicBaseUrl(env["PUBLIC_BASE_URL"], port),
     // dtx-fhir application-test.yaml 값과 일치 — base-url만 localhost:8091로 바꾸면 연결됨
     clientId: parseStringEnv(env["CLIENT_ID"], "test-client-id"),
     clientSecret: parseStringEnv(env["CLIENT_SECRET"], "test-client-secret"),

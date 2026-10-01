@@ -3,6 +3,7 @@ import { beforeEach, describe, it } from "node:test";
 import type { FastifyInstance } from "fastify";
 import { buildApp } from "../src/app.ts";
 import { seedDefaultClientsIfEmpty } from "../src/clients.ts";
+import { isRecord } from "../src/guards.ts";
 import { closeTestDb, initTestDb } from "./helpers/testDb.ts";
 
 async function issueToken(app: FastifyInstance): Promise<string> {
@@ -91,6 +92,104 @@ describe("connect-dtx FHIR", () => {
         "last_dtxresult"
       ];
       assert.ok(stored?.includes("transaction"));
+    } finally {
+      await app.close();
+      closeTestDb();
+    }
+  });
+  it("POST dtxresult classifies daily/weekly and lists them on tabs", async () => {
+    const app = buildApp({ dbPath: ":memory:" });
+    try {
+      const token = await issueToken(app);
+      const daily = {
+        resourceType: "Bundle",
+        type: "transaction",
+        entry: [
+          {
+            resource: {
+              resourceType: "Device",
+              identifier: [{ system: "https://connectdtx.net/phicode", value: "PHI-9" }],
+            },
+          },
+          {
+            resource: {
+              resourceType: "Observation",
+              status: "preliminary",
+              effectivePeriod: {
+                start: "2026-10-01T00:00:00+09:00",
+                end: "2026-10-01T23:59:59+09:00",
+              },
+              component: [
+                { code: { text: "nap" }, valueQuantity: { value: "30", unit: "min" } },
+                { code: { text: "tib" }, valueQuantity: { value: "480", unit: "min" } },
+              ],
+            },
+          },
+        ],
+      };
+      const weekly = {
+        resourceType: "Bundle",
+        type: "transaction",
+        entry: [
+          {
+            resource: {
+              resourceType: "Device",
+              identifier: [{ system: "https://connectdtx.net/phicode", value: "PHI-9" }],
+            },
+          },
+          {
+            resource: {
+              resourceType: "DocumentReference",
+              status: "current",
+              type: { coding: [{ code: "55112-7", display: "Document summary" }] },
+              date: "2026-10-01T08:00:00+09:00",
+              author: { reference: "Device/connectdtx-device-somzz" },
+              content: { attachment: { contentType: "application/pdf", data: "QUJD" } },
+              context: { period: { start: "2026-09-30T08:00:00+09:00" } },
+            },
+          },
+        ],
+      };
+      for (const bundle of [daily, weekly]) {
+        const post = await app.inject({
+          method: "POST",
+          url: "/api/dtx/dtxresult?phicode=PHI-9",
+          headers: { authorization: `Bearer ${token}`, "content-type": "application/fhir+json" },
+          payload: JSON.stringify(bundle),
+        });
+        assert.equal(post.statusCode, 200);
+      }
+      const dailyList = await app.inject({ method: "GET", url: "/admin/dtx-results?kind=daily" });
+      const dailyBody: unknown = dailyList.json();
+      assert.ok(isRecord(dailyBody) && Array.isArray(dailyBody["results"]));
+      const dailyItems = dailyBody["results"];
+      assert.equal(dailyItems.length, 1);
+      const dailyFirst: unknown = dailyItems[0];
+      assert.ok(isRecord(dailyFirst) && dailyFirst["kind"] === "daily");
+      const dailySummary: unknown = isRecord(dailyFirst["summary"])
+        ? dailyFirst["summary"]["daily"]
+        : undefined;
+      assert.ok(isRecord(dailySummary) && Array.isArray(dailySummary["components"]));
+      assert.deepEqual(
+        dailySummary["components"].map((c) => (isRecord(c) ? c["text"] : undefined)),
+        ["nap", "tib"],
+      );
+      const weeklyList = await app.inject({ method: "GET", url: "/admin/dtx-results?kind=weekly" });
+      const weeklyBody: unknown = weeklyList.json();
+      assert.ok(isRecord(weeklyBody) && Array.isArray(weeklyBody["results"]));
+      const weeklyItems = weeklyBody["results"];
+      assert.equal(weeklyItems.length, 1);
+      const weeklyFirst: unknown = weeklyItems[0];
+      assert.ok(isRecord(weeklyFirst) && weeklyFirst["kind"] === "weekly");
+      const weeklySummary: unknown = isRecord(weeklyFirst["summary"])
+        ? weeklyFirst["summary"]["weekly"]
+        : undefined;
+      assert.ok(isRecord(weeklySummary));
+      assert.equal(weeklySummary["typeCode"], "55112-7");
+      assert.equal(weeklySummary["dataSize"], 4);
+      const page = await app.inject({ method: "GET", url: "/dtxresult" });
+      assert.equal(page.statusCode, 200);
+      assert.match(page.headers["content-type"] ?? "", /text\/html/);
     } finally {
       await app.close();
       closeTestDb();

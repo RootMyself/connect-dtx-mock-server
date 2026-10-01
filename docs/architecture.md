@@ -24,7 +24,10 @@ validate를 먼저 호출하고 `"7"`이면 재발급한다 — mock은 이 순�
 
 시나리오 모델: `scenarios` 테이블 `key → "http:result_code"` (예외: `validate=expired`).
 `PUT /admin/scenarios`로 주입, `DELETE /admin/scenarios/:key`로 해제.
-`POST /api/dtx/dtxresult` 수신 본문은 `last_dtxresult` 키에 보관되어 `GET /admin/scenarios`로 확인한다.
+`POST /api/dtx/dtxresult` 수신분은 `dtx_results` 테이블에 매건 적재한다.
+일일=`entry`에 `Observation`, 주간=`DocumentReference` 기준 분류.
+`GET /dtxresult`(일일/주간 탭)·`GET /admin/dtx-results`로 확인한다.
+`last_dtxresult` 키는 기존 디버깅 호환용으로만 유지한다.
 
 처방 Bundle: `src/fixtures/read-*.json` 8종(dtx-fhir golden 복사)을 `phicode` 쿼리값으로 치환해 조립한다.
 `voServiceRequest·voPatient·voOrganization·voPractitionerRole` 4종이 모두 있어야

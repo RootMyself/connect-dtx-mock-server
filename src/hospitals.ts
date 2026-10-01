@@ -59,6 +59,13 @@ export const HOSPITAL_PRESETS: readonly HospitalPreset[] = [
     isGov: false,
   },
   {
+    name: "일산병원",
+    address: "경기도 고양시 일산동구 일산로 100",
+    postal: "10444",
+    phone: "031-900-0114",
+    isGov: true,
+  },
+  {
     name: "테스트병원",
     address: "서울특별시 테스트구",
     postal: "00000",

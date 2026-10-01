@@ -59,7 +59,9 @@ process.once("SIGINT", shutdown);
 
 try {
   await app.listen({ port: config.port, host: config.host });
-  console.log(`connect-dtx-mock-server listening on http://${config.host}:${config.port}`);
+  console.log(
+    `connect-dtx-mock-server listening on ${config.publicBaseUrl} (host ${config.host} port ${config.port})`,
+  );
 } catch (err) {
   app.log.error(err);
   process.exit(1);

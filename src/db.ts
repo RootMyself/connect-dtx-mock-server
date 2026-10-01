@@ -32,6 +32,10 @@ export function initDb(path: string): void {
     "CREATE TABLE IF NOT EXISTS phicodes(phi_code TEXT PRIMARY KEY, user_hash TEXT NOT NULL, org_oid TEXT, created_at INTEGER NOT NULL)",
   );
   db.exec("CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+  db.exec(
+    "CREATE TABLE IF NOT EXISTS dtx_results(id INTEGER PRIMARY KEY AUTOINCREMENT, phicode TEXT NOT NULL DEFAULT '', kind TEXT NOT NULL DEFAULT 'unknown', received_at INTEGER NOT NULL, summary TEXT NOT NULL DEFAULT '{}', body TEXT NOT NULL)",
+  );
+  db.exec("CREATE INDEX IF NOT EXISTS idx_dtx_results_received ON dtx_results(received_at DESC)");
   // 기존 data/connectdtx.db additive 마이그레이션: 구 phicodes(org_oid 없음) → 컬럼 추가.
   const phicodeColumns = new Set(
     (db.prepare("PRAGMA table_info(phicodes)").all() as { name: string }[]).map((row) => row.name),

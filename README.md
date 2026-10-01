@@ -54,6 +54,9 @@ client-id/secret 4종은 mock 기본값이 dtx-fhir `application-test.yaml`과 �
 | `POST` | `/oauth2/token` | `{"access_token":"..."}` |
 | `GET` | `/oauth2/token?grant_type=validate` | `{"result_code":"0"}` / 만료 `"7"` |
 | `GET` | `/phicode` | phi_code 발급 웹페이지 (이름+휴대폰+병원 4종+정부연관 체크) |
+| `GET` | `/dtxresult` | dtxresult 수신 확인 (일일/주간 탭) |
+| `GET` | `/admin/dtx-results?kind=daily\|weekly` | 수신 내역 목록 (요약만) |
+| `GET` | `/admin/dtx-results/:id` | 수신 단건 + 치환된 원문 |
 | `POST` | `/admin/phicodes/issue` | `{"phi_code","org_oid","zone"}` — `isGov:true`면 gov OID·gov zone |
 | `GET` | `/admin/organizations` | 발급된 병원 목록 (oid·zone 순차 발번) |
 
